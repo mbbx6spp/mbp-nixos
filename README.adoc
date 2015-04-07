@@ -4,6 +4,13 @@ This is a repo that will house notes and scripts related to getting
 NixOS running on a newer generation (late 2013+) MacBook Pro laptop
 (Retina).
 
+[WARN]
+----
+There is currently not Linux driver for the Retina MBP webcam on the
+newer generation laptops. So...there is that. Don't say I didn't
+warn you.
+----
+
 === Preparing Installation Media
 
 Contrary to other reports on the internet (in the wild) you do not need
@@ -14,6 +21,15 @@ use some more testing by others (please file bugs if you come across
 them).
 
 Link to original Gist is here: https://gist.github.com/mbbx6spp/61ab23d390483673c1b4
+
+=== Before Installing
+
+You will need to resize your OSX partition. I resized mine to 50Gb. I did this
+booting into the setup/rescue partition and using the disk utility from there.
+
+You cannot resize the current root partition thus why you need to do this :)
+
+Leave the rest as empty.
 
 === Stage1 Installer Workaround
 
@@ -35,6 +51,56 @@ Then the fix is the following:
   your USB drive. Say it is `/dev/sdb`.
 * Now mount it at /mnt-root/iso: `mount /dev/sbd1 /mnt-root/iso`.
 ----
+
+=== Preparing Partitions in Stage2
+
+If you are unsure on how to configure your partitions, then I recommended the
+following basic setup (this is what I did):
+
+[source]
+----
+$ sudo gdisk -l /dev/sda
+
+GPT fdisk (gdisk) version 0.8.8
+
+Partition table scan:
+  MBR: protective
+  BSD: not present
+  APM: not present
+  GPT: present
+
+Found valid GPT with protective MBR; using GPT.
+Disk /dev/sda: 490234752 sectors, 233.8 GiB
+Logical sector size: 512 bytes
+Disk identifier (GUID): XXXXXXXXXXXXXXXXXXXXXXXX
+Partition table holds up to 128 entries
+First usable sector is 34, last usable sector is 490234718
+Partitions will be aligned on 8-sector boundaries
+Total free space is 6 sectors (3.0 KiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1              40          409639   200.0 MiB   EF00  EFI System Partition
+   2          409640        98957655   47.0 GiB    AF05  Customer
+   3        98957656       100227415   620.0 MiB   AB00  Recovery HD
+   4       100227416       205085015   50.0 GiB    8300  nixosroot
+   5       205085016       272193879   32.0 GiB    8200  nixosswap
+   6       272193880       490234718   104.0 GiB   8300  nixoshome
+----
+
+I did this with the following commands after stage2 loaded in the NixOS
+installer:
+
+[source]
+----
+$ mkfs.ext4 -L nixosroot /dev/sda4
+$ mkswap -L nixosswap /dev/sda5
+$ mkfs.ext4 -L nixoshome /dev/sda6
+----
+
+Make sure you mount `/dev/sda1` under `/mnt/boot`. Then you can run:
+`nixos-install`
+
+HTH
 
 === Configuration Post-Install
 
