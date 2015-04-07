@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# Purpose: To create a bootable (USB) drive on OSX
+# Note: For a NixOS 14.12 ISO (~330MB) to a 512MB USB drive, the last step (rsync) took over 3 minutes.
+
+declare -r platform="$(uname -s)"
+
+if [ "${platform}" != "Darwin" ]; then
+  >&2 echo "Error: This will not run on ${platform} (anything other than Darwin."
+  exit 1
+fi
+
+if [ "$#" -ne 2 ]; then
+  >&2 echo "Error: Expected two arguments, received $#."
+  >&2 echo "Usage: $0 SOURCEISO DESKDRIVE"
+  >&2 echo "Example: $0 ~/Downloads/nixos-14.12.iso /dev/disk2"
+  exit 1
+fi
+
+set -eu
+declare -r source_iso="${1}"
+declare -r dest_drive="${2}"
+declare -r tmp_dir="$(mktemp -d -t nixos.XXXXX)"
+declare -r source_dmg="${tmp_dir}/nixos.dmg"
+declare -r vol_root="/Volumes"
+declare -r vol_name="NIXOS_BOOT"
+declare -r vol_dir="${vol_root}/${vol_name}"
+
+if [ ! -f "${source_iso}" ]; then
+  >&2 echo "Error: Given source ISO file does exist or is not a file."
+  exit 1
+fi
+
+if [ -f "${source_dmg}" ]; then
+  >&2 echo "Error: There already exists a DMG file at ${source_dmg}."
+  >&2 echo "       Please remove and rereun to proceed."
+  exit 1
+fi
+
+if [ ! -b "${dest_drive}" ]; then
+  >&2 echo "Error: No block device exists at ${dest_drive}."
+  >&2 echo "       Please confirm drive path and rerun to proceed."
+  exit 1
+fi
+
+# The "magic" of hdiutil and diskutil I gained from many hours using these for bitcoin storage
+# purposes. Don't ask, but I knew there had to be a way to not have to load Ubuntu first and
+# then make the USB bootable for NixOS directly on OSX for users that don't have a physical
+# linux box laying around (for USB purposes).
+# This did take a couple of hours of getting this right though despite my existing knowledge of
+# hdiutil and diskutil ridiculousness. Thanks Apple. :)
+function main {
+  hdiutil convert -format UDRW -o "${source_dmg}" "${source_iso}"
+  diskutil partitionDisk "${dest_drive}" GPTFormat "MS-DOS FAT32" "${vol_name}" "100%"
+  hdiutil attach -readOnly "${source_dmg}" -mountpoint "${tmp_dir}/nixos"
+  rsync -rv --progress "${tmp_dir}/nixos/" "${vol_dir}/"
+  diskutil unmountDisk "${dest_drive}"
+  diskutil eject "${dest_drive}"
+  hdiutil unmount "${tmp_dir}/nixos"
+  rm -rf "${tmp_dir}"
+}
+
+read -p "This will replace all your data on $2. Are you sure you want to proceed? (yes|no) " yn
+case "${yn}" in
+  y|yes)
+    main ;;
+  *)
+    exit 0 ;;
+esac
+
+echo "Now reboot and hold down the Alt/Option then choose this USB drive to boot from."
