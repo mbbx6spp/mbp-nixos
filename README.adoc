@@ -9,7 +9,7 @@ NixOS running on a newer generation (late 2013+) MacBook Pro laptop
 Contrary to other reports on the internet (in the wild) you do not need
 to prerpare your bootable USB installer on another Linux distro.
 
-I used the script link:bin/prepare-boot-drive-from-iso[] which could
+I wrote the script link:bin/prepare-boot-drive-from-iso[] which could
 use some more testing by others (please file bugs if you come across
 them).
 
