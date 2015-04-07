@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Purpose: Install Nix package manager
+
+set -eu
+curl https://nixos.org/nix/install | sh

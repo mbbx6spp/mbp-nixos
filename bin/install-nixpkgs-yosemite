@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Purpose: Setup nixpkgs for Yosemite because Apple sucks and broke everything
+
+declare -r _nixpgks_yosemite_fork="https://github.com/joelteon/nixpkgs.git"
+declare -r _nixpkgs_binary_caches="http://zalora-public-nix-cache.s3-website-ap-southeast-1.amazonaws.com/ http://cache.nixos.org/"
+declare -r _nixpkgs_nix_conf="/etc/nix/nix.conf"
+
+function _usage() {
+  echo "Usage: $0 NIXPKGDIR"
+}
+
+function _main() {
+  local -r dir="${1:-${PWD}}"
+
+  mkdir -p "${dir}"
+  pushd "${dir}"
+  git clone "${_nixpgks_yosemite_fork}"
+  popd
+  nix-channel --remove nixkpkgs
+  rm -rf "${HOME}/.nix-defexpr/nixpkgs"
+  ln -s "${dir}/nixpkgs" "${HOME}/.nix-defexpr/nixpkgs"
+  sudo mkdir -p /etc/nix
+  echo "binary-caches = ${_nixpkgs_binary_caches}" | \
+    sudo tee "${_nixpkgs_nix_conf}"
+  echo "Add this to your shell rc file:"
+  echo "export NIX_PATH=\"${dir}:nixpkgs=${dir}\""
+  nix-env -i hello
+}
+
+if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+  >&2 echo "Error: Sourced executable script ${0}, nothing to do."
+else
+  if [ "$#" -ne 1 ]; then
+    _usage
+    exit 1
+  else
+    case "${1}" in
+      -h|--help) _usage; exit 0;;
+      *) _usage; exit 1;;
+    esac
+  fi
+  set -eu
+  _main "${1}"
+fi
+

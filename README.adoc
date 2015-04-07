@@ -11,6 +11,20 @@ newer generation laptops. So...there is that. Don't say I didn't
 warn you.
 ----
 
+=== Prerequisites
+
+Get comfortable with the Nix package manager on OSX first.
+
+To do that you should install Nix and set it up on Yosemite to work
+somewhat reasonably:
+
+* link:bin/install-nix[] - install Nix from scratch
+* link:bin/install-nixpkgs-yosemite[] - Setup the Nix installation on OSX
+  to use the correct nixpkgs git remote and binary cache.
+
+These scripts I wrote while trying to automate it myself, but probably
+aren't great. Bug reports and patches welcomed. :)
+
 === Preparing Installation Media
 
 Contrary to other reports on the internet (in the wild) you do not need
