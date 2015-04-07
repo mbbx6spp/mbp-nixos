@@ -131,6 +131,9 @@ Use gummiboot. I got gummiboot working straight away.
 
 [source,nix]
 ----
+{
+  # Other stuff up here....
+
   boot.loader.grub.enable = false;
   boot.loader.gummiboot.enable = true;
   # I lowered this timeout because 4 seconds is too long for me
@@ -153,6 +156,9 @@ Use gummiboot. I got gummiboot working straight away.
   # I switched these to false.
   boot.loader.generationsDir.enable = false;
   boot.loader.generationsDir.copyKernels = false;
+
+  # other stuff down here
+}
 ----
 
 ==== Other
