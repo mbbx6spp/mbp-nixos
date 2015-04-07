@@ -1,0 +1,46 @@
+== NixOS on MBP
+
+This is a repo that will house notes and scripts related to getting
+NixOS running on a newer generation (late 2013+) MacBook Pro laptop
+(Retina).
+
+=== Preparing Installation Media
+
+Contrary to other reports on the internet (in the wild) you do not need
+to prerpare your bootable USB installer on another Linux distro.
+
+I used the script link:bin/prepare-boot-drive-from-iso[] which could
+use some more testing by others (please file bugs if you come across
+them).
+
+Link to original Gist is here: https://gist.github.com/mbbx6spp/61ab23d390483673c1b4
+
+=== Stage1 Installer Workaround
+
+Yeah, I know, we need a workaround already. On 14.12 installer you will
+likely encounter a problem with the device detected as the installer (i.e.
+it will not).
+
+Basically it will choose `/dev/sdc` if it is already mounted as `/dev/sdb`
+or vice versa. And then inevitable fail.
+
+Anyway, to get moving on this here is what I did:
+
+[source]
+----
+Choose interactive shell to fix "/dev/sdc: No medium found" errors in stage 1.
+Then the fix is the following:
+
+* find proper device by `dmesg | grep 'logical blocks'` to find device for
+  your USB drive. Say it is `/dev/sdb`.
+* Now mount it at /mnt-root/iso: `mount /dev/sbd1 /mnt-root/iso`.
+----
+
+=== Configuration Post-Install
+
+My `/etc/nixos/configuration.nix` for the MBP can be found at
+link:etc/nixos/configuration.nix[].
+
+Some parts of note that are required for the MBP are:
+
+TODO
