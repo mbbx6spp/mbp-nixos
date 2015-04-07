@@ -92,12 +92,14 @@ installer:
 
 [source]
 ----
-$ mkfs.ext4 -L nixosroot /dev/sda4
-$ mkswap -L nixosswap /dev/sda5
-$ mkfs.ext4 -L nixoshome /dev/sda6
+# mkfs.ext4 -L nixosroot /dev/sda4
+# mkswap -L nixosswap /dev/sda5
+# mkfs.ext4 -L nixoshome /dev/sda6
+# mount /dev/sda4 /mnt
+# mount /dev/sda1 /mnt/boot
 ----
 
-Make sure you mount `/dev/sda1` under `/mnt/boot`. Then you can run:
+*Make sure you mount `/dev/sda1` under `/mnt/boot`. Then you can run:*
 `nixos-install`
 
 HTH
@@ -108,5 +110,37 @@ My `/etc/nixos/configuration.nix` for the MBP can be found at
 link:etc/nixos/configuration.nix[].
 
 Some parts of note that are required for the MBP are:
+
+==== Boot Options
+
+Use gummiboot. I got gummiboot working straight away.
+
+[source]
+----
+  boot.loader.grub.enable = false;
+  boot.loader.gummiboot.enable = true;
+  # I lowered this timeout because 4 seconds is too long for me
+  boot.loader.gummiboot.timeout = 2;
+  # Whether or not the installation process should modify EFI boot variables
+  boot.loader.efi.canTouchEfiVariables = true;
+  # If you rely on a dirty /tmp dir you are doing it wrong. Your laptop will
+  # never be cattle.
+  boot.cleanTmpDir = true;
+  # This gets your audio output and input (mic) working
+  boot.extraModprobeConfig = ''
+    options libata.force=noncq
+    options resume=/dev/sda5
+    options snd_hda_intel index=0 model=intel-mac-auto id=PCH
+    options snd_hda_intel index=1 model=intel-mac-auto id=HDMI
+    options snd-hda-intel model=mbp101
+    options hid_apple fnmode=2
+  '';
+  # because we are using the EFI mount for boot, which is small (tiny actually)
+  # I switched these to false.
+  boot.loader.generationsDir.enable = false;
+  boot.loader.generationsDir.copyKernels = false;
+----
+
+==== Other
 
 TODO
