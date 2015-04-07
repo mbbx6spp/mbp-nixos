@@ -4,9 +4,9 @@ This is a repo that will house notes and scripts related to getting
 NixOS running on a newer generation (late 2013+) MacBook Pro laptop
 (Retina).
 
-[WARN]
+[WARNING]
 ----
-There is currently not Linux driver for the Retina MBP webcam on the
+There is currently no Linux driver for the Retina MBP webcam on the
 newer generation laptops. So...there is that. Don't say I didn't
 warn you.
 ----
@@ -115,7 +115,7 @@ Some parts of note that are required for the MBP are:
 
 Use gummiboot. I got gummiboot working straight away.
 
-[source]
+[source,nix]
 ----
   boot.loader.grub.enable = false;
   boot.loader.gummiboot.enable = true;
