@@ -12,6 +12,13 @@ function _usage() {
 function _main() {
   local -r dir="${1:-${PWD}}"
 
+  if [ "${PLATFORM}" != "Darwin" ]; then
+    >&2 echo "Error: Can only run on Darwin"
+    return 1
+  fi
+
+  set -eu
+
   mkdir -p "${dir}"
   pushd "${dir}"
   git clone "${_nixpgks_yosemite_fork}"
@@ -36,10 +43,8 @@ else
   else
     case "${1}" in
       -h|--help) _usage; exit 0;;
-      *) _usage; exit 1;;
+      *) set -e; _main "${1}";;
     esac
   fi
-  set -eu
-  _main "${1}"
 fi
 
