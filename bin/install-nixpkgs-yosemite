@@ -11,8 +11,9 @@ function _usage() {
 
 function _main() {
   local -r dir="${1:-${PWD}}"
+  local -r platform="$(uname -o)"
 
-  if [ "${PLATFORM}" != "Darwin" ]; then
+  if [ "${platform}" != "Darwin" ]; then
     >&2 echo "Error: Can only run on Darwin"
     return 1
   fi
