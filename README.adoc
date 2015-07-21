@@ -109,14 +109,19 @@ installer:
 # mkfs.ext4 -L nixosroot /dev/sda4
 # mkswap -L nixosswap /dev/sda5
 # mkfs.ext4 -L nixoshome /dev/sda6
+# mkfs.vfat /dev/sda1
 # mount /dev/sda4 /mnt
+# mkdir /mnt/boot
 # mount /dev/sda1 /mnt/boot
 ----
 
-*Make sure you mount `/dev/sda1` under `/mnt/boot`. Then you can run:*
-`nixos-install`
+*Make sure you mount `/dev/sda1` under `/mnt/boot`.*
 
-HTH
+After that run: `nixos-generate-config --root /mnt`
+
+After this you may want to modify the `configuration.nix` to include gummiboot.
+
+Then run:`nixos-install`
 
 === Configuration Post-Install
 
