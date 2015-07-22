@@ -5,7 +5,7 @@
 declare -r platform="$(uname -s)"
 
 if [ "${platform}" != "Darwin" ]; then
-  >&2 echo "Error: This will not run on ${platform} (anything other than Darwin."
+  >&2 echo "Error: This will not run on ${platform} (anything other than Darwin)."
   exit 1
 fi
 
