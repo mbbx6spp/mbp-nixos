@@ -161,6 +161,52 @@ Use gummiboot. I got gummiboot working straight away.
 }
 ----
 
-==== Other
+==== Tidbit: Audio
 
-TODO
+If you use xmonad and you want to attach your Fn keys to the appropriate audio
+behaviors you are accustomed to on OSX/Darwin then you can
+link:https://github.com/mbbx6spp/.home/blob/lookie/dotfiles/xmonad/xmonad.hs#L110-131[take a look at my `xmonad.hs` file].
+
+For those just interested in the raw commands here they are below:
+
+[source,shell]
+----
+$ amixer -q set Master toggle # mute/unmute
+$ amixer -q set Master 5%- # decrease volume by 5%
+$ amixer -q set Master 5%+ # increase volume by 5%
+----
+
+==== Tidbit: Brightness / Visual Tempurature
+
+Some of you may be familiar with OSX apps that changes your brightness and
+screen tone based on the time of day.
+
+On Linux the best one I could find was redshift which is configurable in
+NixOS via the link:https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/x11/redshift.nix[builtin module].
+
+Here is an excerpt from my latest `/etc/nixos/configuration.nix` file for
+redshift configs:
+
+[source,javascript]
+----
+  services.redshift.enable = true;
+  services.redshift.brightness.day = "0.8";
+  services.redshift.brightness.night = "0.4";
+  services.redshift.latitude = "0.0000";
+  services.redshift.longitude = "0.0000";
+----
+
+For the raw commands to use to increase or decrease brightness see below:
+
+[source,shell]
+----
+$ cat /sys/class/backlight/acpi_video0/brightness # echos current brightness level
+10
+$ cat /sys/class/backlight/acpi_video0/max_brightness # echos max brightness level
+100
+$ echo 25 | sudo tee /sys/class/backlight/acpi_video0/brightness # sets brightness to 25/100
+$ cat /sys/class/backlight/acpi_video0/brightness
+25
+----
+
+HTH!
