@@ -39,7 +39,7 @@ Link to original Gist is here: https://gist.github.com/mbbx6spp/61ab23d390483673
 === Before Installing
 
 You will need to resize your OSX partition. I resized mine to 50Gb. I did this
-booting into the setup/rescue partition and using the disk utility from there.
+booting into the OSX Recovery partition and using the Disk Utility from there.
 
 You cannot resize the current root partition thus why you need to do this :)
 
@@ -63,13 +63,17 @@ Then the fix is the following:
 
 * find proper device by `dmesg | grep 'logical blocks'` to find device for
   your USB drive. Say it is `/dev/sdb`.
-* Now mount it at /mnt-root/iso: `mount /dev/sbd1 /mnt-root/iso`.
+* determine which partition on the device to mount by running `fdisk` and
+  inspecting the partitions.
+* Now mount it at /mnt-root/iso: `mount /dev/sdb1 /mnt-root/iso`.
 ----
+
+Now `exit` the interactive shell in stage1 to proceed to stage2 loading.
 
 === Preparing Partitions in Stage2
 
-If you are unsure on how to configure your partitions, then I recommended the
-following basic setup (this is what I did):
+If you are unsure on how to configure your partitions consult the `man gdisk`.
+I suggest the following basic setup (this is what I did):
 
 [source]
 ----
@@ -121,7 +125,7 @@ After that run: `nixos-generate-config --root /mnt`
 
 After this you may want to modify the `configuration.nix` to include gummiboot.
 
-Then run:`nixos-install`
+Then run: `nixos-install`
 
 === Configuration Post-Install
 
