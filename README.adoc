@@ -30,11 +30,28 @@ aren't great. Bug reports and patches welcomed. :)
 Contrary to other reports on the internet (in the wild) you do not need
 to prerpare your bootable USB installer on another Linux distro.
 
+
+[NOTICE]
+====
+For NixOS 14.12 and below:
+
 I wrote the script link:bin/prepare-boot-drive-from-iso[] which could
 use some more testing by others (please file bugs if you come across
 them).
 
 Link to original Gist is here: https://gist.github.com/mbbx6spp/61ab23d390483673c1b4
+====
+
+For NixOS 15.x and above you can just `dd` the ISO image downloaded
+from the NixOS Download page.
+
+The command I used on my NixOS box was the following, though on OSX you should
+be able to use `/dev/disk2` or similar after unmounting the USB drive in OSX.
+
+[source,bash]
+----
+sudo dd bs=4M if=path/to/nixos-minimal-15.09.431.52a881-x86_64-linux.iso of=/dev/sdc
+----
 
 === Before Installing
 
@@ -99,21 +116,33 @@ Total free space is 6 sectors (3.0 KiB)
 Number  Start (sector)    End (sector)  Size       Code  Name
    1              40          409639   200.0 MiB   EF00  EFI System Partition
    2          409640        98957655   47.0 GiB    AF05  Customer
-   3        98957656       100227415   620.0 MiB   AB00  Recovery HD
-   4       100227416       205085015   50.0 GiB    8300  nixosroot
-   5       205085016       272193879   32.0 GiB    8200  nixosswap
-   6       272193880       490234718   104.0 GiB   8300  nixoshome
+   3        XXXXXXXX       XXXXXXXXX   620.0 MiB   AB00  Recovery HD
+   4       XXXXXXXXX       XXXXXXXXX   50.0 GiB    8300  nixosroot
+   5       XXXXXXXXX       XXXXXXXXX   16.0 GiB    8200  nixosswap
+   6       XXXXXXXXX       XXXXXXXXX   120.0 GiB   8300  nixoshome
 ----
 
 I did this with the following commands after stage2 loaded in the NixOS
 installer:
 
-[source]
+[source,shell]
 ----
 # mkfs.ext4 -L nixosroot /dev/sda4
 # mkswap -L nixosswap /dev/sda5
 # mkfs.ext4 -L nixoshome /dev/sda6
+----
+
+If you do not already have a `vfat` filesystem for boot images you will need
+to run the following command:
+
+[source,shell]
+----
 # mkfs.vfat /dev/sda1
+----
+
+Now we need to mount the new or existing filesystems:
+
+----
 # mount /dev/sda4 /mnt
 # mkdir /mnt/boot
 # mount /dev/sda1 /mnt/boot
@@ -158,7 +187,7 @@ Use gummiboot. I got gummiboot working straight away.
     options resume=/dev/sda5
     options snd_hda_intel index=0 model=intel-mac-auto id=PCH
     options snd_hda_intel index=1 model=intel-mac-auto id=HDMI
-    options snd-hda-intel model=mbp101
+    options snd_hda_intel model=mbp101
     options hid_apple fnmode=2
   '';
   # because we are using the EFI mount for boot, which is small (tiny actually)
