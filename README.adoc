@@ -117,6 +117,7 @@ installer:
 # mount /dev/sda4 /mnt
 # mkdir /mnt/boot
 # mount /dev/sda1 /mnt/boot
+# swapon /dev/disk/by-label/nixosswap
 ----
 
 *Make sure you mount `/dev/sda1` under `/mnt/boot`.*
