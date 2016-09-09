@@ -110,9 +110,8 @@ Number  Start (sector)    End (sector)  Size       Code  Name
    1              40          409639   200.0 MiB   EF00  EFI System Partition
    2          409640        98957655   47.0 GiB    AF05  Customer
    3        XXXXXXXX       XXXXXXXXX   620.0 MiB   AB00  Recovery HD
-   4       XXXXXXXXX       XXXXXXXXX   50.0 GiB    8300  nixosroot
+   4       XXXXXXXXX       XXXXXXXXX   170.0 GiB   8300  nixosroot
    5       XXXXXXXXX       XXXXXXXXX   16.0 GiB    8200  nixosswap
-   6       XXXXXXXXX       XXXXXXXXX   120.0 GiB   8300  nixoshome
 ----
 
 I did this with the following commands after stage2 loaded in the NixOS
@@ -122,11 +121,10 @@ installer:
 ----
 # mkfs.ext4 -L nixosroot /dev/sda4
 # mkswap -L nixosswap /dev/sda5
-# mkfs.ext4 -L nixoshome /dev/sda6
 ----
 
 If you do not already have a `vfat` filesystem for boot images you will need
-to run the following command:
+to run the following command (I didn't need to do this):
 
 [source,shell]
 ----
