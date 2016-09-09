@@ -23,6 +23,13 @@ aren't great. Bug reports and patches welcomed. :)
 Contrary to other reports on the internet (in the wild) you do not need
 to prerpare your bootable USB installer on another Linux distro.
 
+*You should be using 16.03 or 16.09 images at this point!*
+
+As of 2016-09-09 here are the latest `nixos` image download locations:
+
+* link:http://nixos.org/releases/nixos/16.03/nixos-16.03.1287.6ac7ffd/[16.03]
+* link:http://nixos.org/releases/nixos/16.09/nixos-16.09beta172.e3bdf6b/[16.09beta]
+
 
 [NOTICE]
 ====
