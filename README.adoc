@@ -23,6 +23,13 @@ aren't great. Bug reports and patches welcomed. :)
 Contrary to other reports on the internet (in the wild) you do not need
 to prerpare your bootable USB installer on another Linux distro.
 
+*You should be using 16.03 or 16.09 images at this point!*
+
+As of 2016-09-09 here are the latest `nixos` image download locations:
+
+* link:http://nixos.org/releases/nixos/16.03/nixos-16.03.1287.6ac7ffd/[16.03]
+* link:http://nixos.org/releases/nixos/16.09/nixos-16.09beta172.e3bdf6b/[16.09beta]
+
 
 [NOTICE]
 ====
@@ -110,9 +117,8 @@ Number  Start (sector)    End (sector)  Size       Code  Name
    1              40          409639   200.0 MiB   EF00  EFI System Partition
    2          409640        98957655   47.0 GiB    AF05  Customer
    3        XXXXXXXX       XXXXXXXXX   620.0 MiB   AB00  Recovery HD
-   4       XXXXXXXXX       XXXXXXXXX   50.0 GiB    8300  nixosroot
+   4       XXXXXXXXX       XXXXXXXXX   170.0 GiB   8300  nixosroot
    5       XXXXXXXXX       XXXXXXXXX   16.0 GiB    8200  nixosswap
-   6       XXXXXXXXX       XXXXXXXXX   120.0 GiB   8300  nixoshome
 ----
 
 I did this with the following commands after stage2 loaded in the NixOS
@@ -120,13 +126,14 @@ installer:
 
 [source,shell]
 ----
-# mkfs.ext4 -L nixosroot /dev/sda4
+# cryptsetup luksFormat /dev/sda4
+# cryptsetup luksOpen /dev/sda4 nixosroot
+# mkfs.ext4 /dev/mapper/nixosroot
 # mkswap -L nixosswap /dev/sda5
-# mkfs.ext4 -L nixoshome /dev/sda6
 ----
 
 If you do not already have a `vfat` filesystem for boot images you will need
-to run the following command:
+to run the following command (I didn't need to do this):
 
 [source,shell]
 ----
@@ -136,7 +143,7 @@ to run the following command:
 Now we need to mount the new or existing filesystems:
 
 ----
-# mount /dev/sda4 /mnt
+# mount /dev/mapper/nixosroot /mnt
 # mkdir /mnt/boot
 # mount /dev/sda1 /mnt/boot
 # swapon /dev/disk/by-label/nixosswap
