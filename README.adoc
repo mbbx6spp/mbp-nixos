@@ -126,7 +126,9 @@ installer:
 
 [source,shell]
 ----
-# mkfs.ext4 -L nixosroot /dev/sda4
+# cryptsetup luksFormat /dev/sda4
+# cryptsetup luksOpen /dev/sda4 nixosroot
+# mkfs.ext4 /dev/mapper/nixosroot
 # mkswap -L nixosswap /dev/sda5
 ----
 
@@ -141,7 +143,7 @@ to run the following command (I didn't need to do this):
 Now we need to mount the new or existing filesystems:
 
 ----
-# mount /dev/sda4 /mnt
+# mount /dev/mapper/nixosroot /mnt
 # mkdir /mnt/boot
 # mount /dev/sda1 /mnt/boot
 # swapon /dev/disk/by-label/nixosswap
