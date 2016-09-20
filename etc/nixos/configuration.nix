@@ -15,13 +15,13 @@ in
 
   #boot.kernelPackages = pkgs.linuxPackages_3_18;
   boot.loader.grub.enable = false;
-  boot.loader.gummiboot.enable = true;
-  boot.loader.gummiboot.timeout = 2;
+  boot.loader.systemd-boot.enable = true;
+  #boot.loader.systemd-boot.timeout = 2;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.cleanTmpDir = true;
   boot.extraModprobeConfig = ''
     options libata.force=noncq
-    options resume=/dev/sda5
+    options resume=/dev/sda3
     options snd_hda_intel index=0 model=intel-mac-auto id=PCH
     options snd_hda_intel index=1 model=intel-mac-auto id=HDMI
     options snd-hda-intel model=mbp101
@@ -47,28 +47,28 @@ in
     terminus_font
   ];
 
-  nix.useChroot = true;
-  nix.trustedBinaryCaches = [ http://hydra.nixos.org ];
+  nix.useSandbox = true;
+  #nix.trustedBinaryCaches = [ http://hydra.nixos.org ];
   nix.binaryCaches =
     [
       https://cache.nixos.org
     ];
 
   # TODO: Update
-  networking.hostName = "myhostname";
-  networking.interfaceMonitor.enable = true;
+  networking.hostName = "dkmbp0";
   networking.firewall.enable = true;
   networking.wireless.enable = true;
   #networking.wicd.enable = true;
-  networking.vpnc.services = {
-    default = builtins.readFile ./vpnc.conf;
-  };
+#  networking.vpnc.services = {
+#    default = builtins.readFile ./vpnc.conf;
+#  };
 
   # TODO: enable bluetooth if you use it on your MBP, otherwise I
   # just disable to save on battery.
-  hardware.bluetooth.enable = false;
+  hardware.bluetooth.enable = true;
   # This enables the facetime HD webcam on newer Macbook Pros (mid-2014+).
   hardware.facetimehd.enable = true;
+  hardware.opengl.extraPackages = [ pkgs.vaapiIntel ];
 
   environment.variables = {
     #MY_ENV_VAR = "\${HOME}/bla/bla";
@@ -77,27 +77,14 @@ in
   # you should keep most of your apps in your user profile.
   environment.systemPackages = with pkgs; [
     # CLI tools
-    ack
-    binutils
-    psmisc
-    file
-    gitFull
-    curl
-    tmux
     screen
-    w3m
-    mutt
-    fortune
-    tig
     tcpdump
     acpi
+    vim
+    git
   ];
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.firefox.enableGoogleTalkPlugin = true;
-  nixpkgs.config.firefox.enableAdobeFlash = true;
-  nixpkgs.config.chromium.enablePepperFlash = true;
-  nixpkgs.config.chromium.enablePepperPDF = true;
   nixpkgs.config.packageOverrides = pkgs: {
     # TODO: If you need Thunderbolt module you can uncomment the
     # block below:
@@ -120,17 +107,16 @@ in
   services.xserver.enableTCP = false;
   services.xserver.layout = "us";
   services.xserver.xkbVariant = "mac";
-  services.xserver.videoDrivers = [ "intel" "nouveau" ];
+  #services.xserver.videoDrivers = [ "intel" ];
   services.xserver.xkbOptions = "terminate:ctrl_alt_bksp, ctrl:nocaps";
-  services.xserver.vaapiDrivers = [ pkgs.vaapiIntel ];
 
   services.xserver.desktopManager.default = "none";
   services.xserver.desktopManager.xterm.enable = false;
 
   services.xserver.displayManager.slim.enable = true;
-  services.xserver.displayManager.desktopManagerHandlesLidAndPower = false;
+  services.xserver.displayManager.slim.theme = pkgs.slimThemes.lake.src;
 
-  services.xserver.windowManager.default = "xmonad";
+  #services.xserver.windowManager.default = "xmonad";
   services.xserver.windowManager.xmonad.enable = true;
   services.xserver.windowManager.xmonad.enableContribAndExtras = true;
 
@@ -158,7 +144,7 @@ in
     uid = 1000;
     group = "users";
     description = "Susan Potter";
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "networkmanager" "systemd-journal" "disk" "audio" "video" ];
     createHome = true;
     home = "/home/spotter";
   };
