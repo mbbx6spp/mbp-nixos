@@ -27,15 +27,14 @@ in
     options snd-hda-intel model=mbp101
     options hid_apple fnmode=2
   '';
-  #boot.loader.generationsDir.enable = false;
-  #boot.loader.generationsDir.copyKernels = false;
 
-  # TODO: update
+  # TODO: update timezone for your needs
   time.timeZone = "America/Chicago";
 
   fonts.enableFontDir = true;
   fonts.enableCoreFonts = true;
   fonts.enableGhostscriptFonts = true;
+  # I like fonts. Sue me.
   fonts.fonts = with pkgs; [
     corefonts
     inconsolata
@@ -48,26 +47,27 @@ in
   ];
 
   nix.useSandbox = true;
-  #nix.trustedBinaryCaches = [ http://hydra.nixos.org ];
   nix.binaryCaches =
     [
       https://cache.nixos.org
     ];
 
-  # TODO: Update
+  # TODO: Update hostname to your liking
   networking.hostName = "dkmbp0";
+  # Manage your /etc/hosts file below
+  networking.extraHosts = ''
+    127.0.0.1 myawesome.devbox
+  '';
   networking.firewall.enable = true;
   networking.wireless.enable = true;
-  #networking.wicd.enable = true;
-#  networking.vpnc.services = {
-#    default = builtins.readFile ./vpnc.conf;
-#  };
 
   # TODO: enable bluetooth if you use it on your MBP, otherwise I
   # just disable to save on battery.
   hardware.bluetooth.enable = true;
   # This enables the facetime HD webcam on newer Macbook Pros (mid-2014+).
   hardware.facetimehd.enable = true;
+  # Enable pulseaudio for audio
+  hardware.pulseaudio.enable = true;
   hardware.opengl.extraPackages = [ pkgs.vaapiIntel ];
 
   environment.variables = {
@@ -100,7 +100,29 @@ in
   programs.light.enable = true;
   programs.bash.enableCompletion = true;
 
+  services.dnsmasq.enable = true;
+  # TODO: Update your DNSmasq configuration below to your needs
+  services.dnsmasq.extraConfig = ''
+    address=/dev/127.0.0.1
+    server=/bla.cool/IPHERE
+  '';
+  # TODO: Update your DNS servers below
+  services.dnsmasq.servers = [
+    "8.8.4.4"
+    "8.8.8.8"
+  ];
+
   services.locate.enable = true;
+
+  # TODO: uncomment and setup your openvpn config below (expects config info
+  # in /etc/nixos/mycorp/ dir).
+  #services.openvpn.servers.mycorp = {
+  #  autoStart = false; # requires you `sudo systemctl start openvpn-mycorp` manually
+  #  config = builtins.readFile ./mycorp/openvpn.conf;
+  #  up = "${pkgs.update-resolve-conf}/libexec/openvpn/update-resolve-conf";
+  #  down = "${pkgs.update-resolve-conf}/libexec/openvpn/update-resolve-conf";
+  #};
+
   services.tlp.enable = true;
 
   services.xserver.enable = true;
@@ -109,16 +131,15 @@ in
   services.xserver.xkbVariant = "mac";
   #services.xserver.videoDrivers = [ "intel" ];
   services.xserver.xkbOptions = "terminate:ctrl_alt_bksp, ctrl:nocaps";
+  # TODO: uncomment if you use an external HTMI monitor
+  #services.xserver.xrandrHeads = [ "HDMI-0" "eDP" ];
+  #services.xserver.resolutions = [
+  #  { x = "3840"; y = "2160"; }
+  #  { x = "2880"; y = "1800"; }
+  #];
 
-  services.xserver.desktopManager.default = "none";
-  services.xserver.desktopManager.xterm.enable = false;
-
-  services.xserver.displayManager.slim.enable = true;
-  services.xserver.displayManager.slim.theme = pkgs.slimThemes.lake.src;
-
-  #services.xserver.windowManager.default = "xmonad";
-  services.xserver.windowManager.xmonad.enable = true;
-  services.xserver.windowManager.xmonad.enableContribAndExtras = true;
+  services.xserver.desktopManager.kde5.enable = true;
+  services.xserver.displayManager.kdm.enable = true;
 
   services.xserver.multitouch.enable = true;
   services.xserver.multitouch.invertScroll = true;
@@ -144,8 +165,19 @@ in
     uid = 1000;
     group = "users";
     description = "Susan Potter";
-    extraGroups = [ "wheel" "networkmanager" "systemd-journal" "disk" "audio" "video" ];
+    extraGroups = [
+      "wheel"
+      "docker"
+      "networkmanager"
+      "messagebus"
+      "systemd-journal"
+      "disk"
+      "audio"
+      "video"
+    ];
     createHome = true;
     home = "/home/spotter";
   };
+
+  virtualisation.docker.enable = true;
 }

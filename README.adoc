@@ -4,20 +4,6 @@ This is a repo that will house notes and scripts related to getting
 NixOS running on a newer generation (late 2013+) MacBook Pro laptop
 (Retina).
 
-=== Prerequisites
-
-Get comfortable with the Nix package manager on OSX first.
-
-To do that you should install Nix and set it up on Yosemite to work
-somewhat reasonably:
-
-* link:bin/install-nix[] - install Nix from scratch
-* link:bin/install-nixpkgs-yosemite[] - Setup the Nix installation on OSX
-  to use the correct nixpkgs git remote and binary cache.
-
-These scripts I wrote while trying to automate it myself, but probably
-aren't great. Bug reports and patches welcomed. :)
-
 === Preparing Installation Media
 
 Contrary to other reports on the internet (in the wild) you do not need
@@ -25,67 +11,44 @@ to prerpare your bootable USB installer on another Linux distro.
 
 *You should be using 16.03 or 16.09 images at this point!*
 
-As of 2016-09-09 here are the latest `nixos` image download locations:
+As of 2016-10-15 here are the latest `nixos` image download locations:
 
-* link:http://nixos.org/releases/nixos/16.03/nixos-16.03.1287.6ac7ffd/[16.03]
-* link:http://nixos.org/releases/nixos/16.09/nixos-16.09beta172.e3bdf6b/[16.09beta]
+* link:https://nixos.org/releases/nixos/16.09[NixOS 16.09]
 
-
-[NOTICE]
-====
-For NixOS 14.12 and below:
-
-I wrote the script link:bin/prepare-boot-drive-from-iso[] which could
-use some more testing by others (please file bugs if you come across
-them).
-
-Link to original Gist is here: https://gist.github.com/mbbx6spp/61ab23d390483673c1b4
-====
-
-For NixOS 15.x and above you can just `dd` the ISO image downloaded
-from the NixOS Download page.
+Download the minimal ISO from the link above.
 
 The command I used on my NixOS box was the following, though on OSX you should
 be able to use `/dev/disk2` or similar after unmounting the USB drive in OSX.
 
+When preparing your USB install drive on Linux run:
+
 [source,bash]
 ----
-sudo dd bs=4M if=path/to/nixos-minimal-15.09.431.52a881-x86_64-linux.iso of=/dev/sdc
+sudo dd bs=4M if=path/to/nixos-minimal-16.09-x86_64-linux.iso of=/dev/sdc
 ----
+
+When preparing your USB install drive on OS X or BSD-based distributions run:
+
+[source,bash]
+----
+sudo dd bs=4m if=path/to/nixos-minimal-16.09-x86_64-linux.iso of=/dev/disk2
+----
+
 
 === Before Installing
 
-You will need to resize your OSX partition. I resized mine to 50Gb. I did this
-booting into the OSX Recovery partition and using the Disk Utility from there.
+You will need to resize your OSX partition. I did this by booting into the
+OSX Recovery partition and using the Disk Utility from there.
 
-You cannot resize the current root partition thus why you need to do this :)
+To boot into the Recovery partition you hold down the Cmd+R keys on boot
+startup until you see it enter Recovery mode.
 
-Leave the rest as empty.
+=== Boot USB Drive
 
-=== Stage1 Installer Workaround
+Boot from the USB drive by holding down the Option key during the boot
+startup tone until you see options of devices to boot from.
 
-Yeah, I know, we need a workaround already. On 14.12 installer you will
-likely encounter a problem with the device detected as the installer (i.e.
-it will not).
-
-Basically it will choose `/dev/sdc` if it is already mounted as `/dev/sdb`
-or vice versa. And then inevitable fail.
-
-Anyway, to get moving on this here is what I did:
-
-[source]
-----
-Choose interactive shell to fix "/dev/sdc: No medium found" errors in stage 1.
-Then the fix is the following:
-
-* find proper device by `dmesg | grep 'logical blocks'` to find device for
-  your USB drive. Say it is `/dev/sdb`.
-* determine which partition on the device to mount by running `fdisk` and
-  inspecting the partitions.
-* Now mount it at /mnt-root/iso: `mount /dev/sdb1 /mnt-root/iso`.
-----
-
-Now `exit` the interactive shell in stage1 to proceed to stage2 loading.
+You will likely need to choose the second option called 'EFI Boot'.
 
 === Preparing Partitions in Stage2
 
@@ -174,9 +137,7 @@ Use gummiboot. I got gummiboot working straight away.
   # Other stuff up here....
 
   boot.loader.grub.enable = false;
-  boot.loader.gummiboot.enable = true;
-  # I lowered this timeout because 4 seconds is too long for me
-  boot.loader.gummiboot.timeout = 2;
+  boot.loader.systemd-boot.enable = true;
   # Whether or not the installation process should modify EFI boot variables
   boot.loader.efi.canTouchEfiVariables = true;
   # If you rely on a dirty /tmp dir you are doing it wrong. Your laptop will
@@ -191,14 +152,12 @@ Use gummiboot. I got gummiboot working straight away.
     options snd_hda_intel model=mbp101
     options hid_apple fnmode=2
   '';
-  # because we are using the EFI mount for boot, which is small (tiny actually)
-  # I switched these to false.
-  boot.loader.generationsDir.enable = false;
-  boot.loader.generationsDir.copyKernels = false;
 
-  # other stuff down here
+  # some other stuff below here
 }
 ----
+
+See the full base configuration at link:etc/nixos/configuration.nix[configuration.nix].
 
 ==== Tidbit: Audio
 
