@@ -7,7 +7,7 @@ NixOS running on a newer generation (late 2013+) MacBook Pro laptop
 === Preparing Installation Media
 
 Contrary to other reports on the internet (in the wild) you do not need
-to prerpare your bootable USB installer on another Linux distro.
+to prepare your bootable USB installer on another Linux distro.
 
 *You should be using 16.03 or 16.09 images at this point!*
 
@@ -17,8 +17,8 @@ As of 2016-10-15 here are the latest `nixos` image download locations:
 
 Download the minimal ISO from the link above.
 
-The command I used on my NixOS box was the following, though on OSX you should
-be able to use `/dev/disk2` or similar after unmounting the USB drive in OSX.
+The command I used on my NixOS box was the following, though on OS X you should
+be able to use `/dev/disk2` or similar after unmounting the USB drive in OS X.
 
 When preparing your USB install drive on Linux run:
 
@@ -37,8 +37,8 @@ sudo dd bs=4m if=path/to/nixos-minimal-16.09-x86_64-linux.iso of=/dev/disk2
 
 === Before Installing
 
-You will need to resize your OSX partition. I did this by booting into the
-OSX Recovery partition and using the Disk Utility from there.
+You will need to resize your OS X partition. I did this by booting into the
+OS X Recovery partition and using the Disk Utility from there.
 
 To boot into the Recovery partition you hold down the Cmd+R keys on boot
 startup until you see it enter Recovery mode.
