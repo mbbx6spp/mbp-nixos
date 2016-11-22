@@ -13,7 +13,7 @@ to prerpare your bootable USB installer on another Linux distro.
 
 As of 2016-10-15 here are the latest `nixos` image download locations:
 
-* link:https://d3g5gsiof5omrk.cloudfront.net/nixos/16.09/nixos-16.09.1086.7596205/nixos-graphical-16.09.1086.7596205-x86_64-linux.iso[NixOS 16.09]
+* link:https://d3g5gsiof5omrk.cloudfront.net/nixos/16.09/nixos-16.09.1086.7596205/nixos-minimal-16.09.1086.7596205-x86_64-linux.iso[NixOS 16.09]
 
 Download the minimal ISO from the link above.
 
